@@ -25,7 +25,7 @@ export function TodoListIndex() {
       setData(response?.data?.data)
     } catch (err) {
       console.error(err)
-      toast.success('Erro ao buscar tarefas.')
+      toast.error('Erro ao buscar tarefas.')
     } finally {
       setLoading(false)
     }
