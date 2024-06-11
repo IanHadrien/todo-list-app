@@ -1,84 +1,70 @@
 // import { Tasks } from "./components/Tasks";
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { IoAddSharp } from 'react-icons/io5'
 import { CiCircleList } from 'react-icons/ci'
-import axios from 'axios'
-import { Tasks } from '../components/tasks'
-// import TodoApi from '../api'
-import { toast } from 'react-toastify'
-// import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Tasks } from './partials/tasks'
+import TodoApi from '../api'
+import { useQuery } from '@tanstack/react-query'
+import CreateModal from './partials/createModal'
 
-const APP_URL = 'http://127.0.0.1:8000/api'
+// const APP_URL = 'http://127.0.0.1:8000/api'
 
 export function TodoListIndex() {
   // const queryClient = useQueryClient()
-  const [textTask, setTextTask] = useState('')
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [isOpenModalCreate, setIsOpenModalCreate] = useState(false)
+  // const [data, setData] = useState([])
+  // const [loading, setLoading] = useState(false)
 
   // Exemplo 1 GET
-  const fetchData = async () => {
-    setLoading(true)
-    try {
-      // const response = await TodoApi.GetAll()
-      const response = await axios.get(`${APP_URL}/todos`)
-      setData(response?.data?.data)
-    } catch (err) {
-      console.error(err)
-      toast.error('Erro ao buscar tarefas.')
-    } finally {
-      setLoading(false)
-    }
-  }
+  // const fetchData = async () => {
+  //   setLoading(true)
+  //   try {
+  //     // const response = await TodoApi.GetAll()
+  //     const response = await axios.get(`${APP_URL}/todos`)
+  //     setData(response?.data?.data)
+  //   } catch (err) {
+  //     console.error(err)
+  //     toast.error('Erro ao buscar tarefas.')
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
-  // const { data, isLoading } = useQuery({
-  //   queryKey: ['todoGetAll'],
-  //   queryFn: () => TodoApi.GetAll(),
-  // })
+  // useEffect(() => {
+  //   fetchData()
+  // }, [])
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['todoGetAll'],
+    queryFn: () => TodoApi.GetAll(),
+  })
   // console.log(data)
 
-  useEffect(() => {
-    fetchData()
-  }, [])
-
   // Exemplo 2 POST
-  const submit = async () => {
-    try {
-      await axios.post(APP_URL + '/todos', {
-        task: textTask,
-        due: '22-09-2024',
-        status: false,
-      })
-      toast.success('Tarefa cadastrada com sucesso.')
-    } catch (err) {
-      console.error('Error: ', err?.response?.data?.data)
-      toast.error('Erro ao cadastrar a tarefa.')
-    } finally {
-      fetchData()
-    }
-  }
-
-  // const { mutate, isLoading: isLoadingAdd } = useMutation({
-  //   mutationFn: async (data) => await TodoApi.Add(data),
-  //   onSuccess: () => {
-  //     // queryClient.refetchQueries(['todoGetAll'])
+  // const submit = async () => {
+  //   try {
+  //     await axios.post(APP_URL + '/todos', {
+  //       task: textTask,
+  //       due: '22-09-2024',
+  //       status: false,
+  //     })
   //     toast.success('Tarefa cadastrada com sucesso.')
-  //   },
-  //   onError: () => {
-  //     toast.error('Não foi possível excluir a plantação')
-  //   },
-  // })
+  //   } catch (err) {
+  //     console.error('Error: ', err?.response?.data?.data)
+  //     toast.error('Erro ao cadastrar a tarefa.')
+  //   } finally {
+  //     fetchData()
+  //   }
+  // }
 
   const addTask = (e) => {
     e.preventDefault()
-    submit()
-    // const tempObj = {
-    //   task: textTask,
-    //   due: '22-09-2024',
-    //   status: false,
-    // }
-    // mutate(tempObj)
-    setTextTask('')
+    // submit()
+    setIsOpenModalCreate(true)
+  }
+
+  const handleCloseModalCreate = () => {
+    setIsOpenModalCreate(false)
   }
 
   return (
@@ -99,24 +85,23 @@ export function TodoListIndex() {
             onSubmit={addTask}
             className="flex w-700 items-center gap-2 -mt-7"
           >
-            <input
-              className="flex flex-1 p-4 text-ignite-gary100 items-center gap-2 rounded-lg border border-ignite-gary700 bg-ignite-gary500 default:text-ignite-gary500"
-              type="text"
-              placeholder="Adicione uma nova tarefa"
-              value={textTask}
-              onChange={(e) => setTextTask(e.target.value)}
-              required
-            />
-            <button className="inline-block p-4 justify-center items-center gap-2 rounded-lg bg-ignite-blueDark hover:bg-ignite-blue transition">
-              <p className="text-ignite-gary100 text-sm font-bold flex">
+            <button className="w-full inline-block p-4 justify-center items-center gap-2 rounded-lg bg-ignite-blueDark hover:bg-ignite-blue transition">
+              <p className="text-ignite-gary100 text-sm font-bold flex items-center justify-center">
                 <span className="pr-2">Criar</span>
                 <IoAddSharp size={20} />
               </p>
             </button>
           </form>
-          <Tasks tasks={data} loading={loading} />
+          <Tasks tasks={data?.data?.data} loading={isLoading} />
         </div>
       </main>
+
+      {isOpenModalCreate && (
+        <CreateModal
+          closeModal={handleCloseModalCreate}
+          isOpen={isOpenModalCreate}
+        />
+      )}
     </div>
   )
 }

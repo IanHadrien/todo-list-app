@@ -2,8 +2,8 @@
 import { FiAlertTriangle } from 'react-icons/fi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import Modal from './modal'
-import TodoApi from '../api'
+import Modal from '../../components/modal'
+import TodoApi from '../../api'
 
 export default function DeleteModal({ closeModal, id, isOpen }) {
   const queryClient = useQueryClient()
